@@ -7,11 +7,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import ru.geekbrains.june.chat.server.AuthService;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
     @FXML
@@ -35,6 +38,8 @@ public class Controller {
 
 
     private String name;
+    private String directory = String.format("history_%s.txt", name);
+
 
     public void setAuthorized(boolean authorized) { //При значении "true" пропадает окно авторизации, появляется чат
         msgPanel.setVisible(authorized);
@@ -73,16 +78,15 @@ public class Controller {
     public void tryToAuth() throws InterruptedException { //Попытка авторизации. Отправляет запрос на ClientHandler. Тот сравнивает с БД.
         String login = loginField.getText();
         String password = passwordField.getText();
-        for (int i = 0; i < 2; i++) {
-            try {
-                out.writeUTF("/auth " + login + " " + password);
-                name = loginField.getText();
-                loginField.clear();
-                passwordField.clear();
-            } catch (IOException e) {
-                showError("Невозможно отправить запрос авторизации на сервер");
-            }
+        try {
+            out.writeUTF("/auth " + login + " " + password);
+            this.name = loginField.getText();
+            loginField.clear();
+            passwordField.clear();
+        } catch (IOException e) {
+            showError("Невозможно отправить запрос авторизации на сервер");
         }
+
     }
 
     public void connect() {
@@ -112,9 +116,10 @@ public class Controller {
                 }
                 if (inputMessage.startsWith("/authok ")) {  //Сервер вернёт сообщение, которе начинается с "/authok ", если пользователь существует в БД
                     setAuthorized(true);
+                    loadHistory();
                     break;
                 }
-                    chatArea.appendText(inputMessage + "\n");
+                chatArea.appendText(inputMessage + "\n");
             }
             while (true) {
                 String inputMessage = in.readUTF();
@@ -135,6 +140,7 @@ public class Controller {
                     continue;
                 }
                 chatArea.appendText(inputMessage + "\n");
+                saveHistory();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -142,7 +148,6 @@ public class Controller {
             closeConnection();
         }
     }
-
 
     private void closeConnection() {
         setAuthorized(false);
@@ -193,4 +198,52 @@ public class Controller {
             messageField.selectEnd();
         }
     }
+
+
+    private void saveHistory() throws IOException {
+        try {
+            File history = new File(directory);
+            if (!history.exists()) {
+                System.out.println("File is not exist. Creating.");
+                history.createNewFile();
+            }
+            PrintWriter fileWriter = new PrintWriter(new FileWriter(history, false));
+
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(chatArea.getText());
+            bufferedWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadHistory() throws IOException {
+        int historysrtings = 100;
+        File history = new File(directory);
+        if (!history.exists()) {
+            System.out.println("File is not exist. Creating.");
+            history.createNewFile();
+        }
+        List<String> historyList = new ArrayList<>();
+        FileInputStream in = new FileInputStream(history);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+
+        String temp;
+        while ((temp = bufferedReader.readLine()) != null) {
+            historyList.add(temp);
+        }
+
+        if (historyList.size() > historysrtings) {
+            for (int i = historyList.size() - historysrtings; i <= (historyList.size() - 1); i++) {
+                chatArea.appendText(historyList.get(i) + "\n");
+            }
+        } else {
+            for (int i = 0; i < historyList.size(); i++) {
+                chatArea.appendText(historyList.get(i) + "\n");
+            }
+        }
+    }
 }
+
+
