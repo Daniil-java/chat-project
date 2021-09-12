@@ -40,7 +40,8 @@ public class ClientHandler {
 
     private void logic() { //Отключение пользователя от сервера
         try {
-            while (!consumeAuthorizeMessage(in.readUTF()));
+//            while (!consumeAuthorizeMessage(in.readUTF()));
+            while (!consumeAuthorizeMessage());
             while (consumeRegularMessage(in.readUTF()));
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,7 +66,7 @@ public class ClientHandler {
         return true;
     }
 
-    private boolean consumeAuthorizeMessage(String message) throws IOException { //Узнаём имя пользователя
+    private boolean consumeAuthorizeMessage() throws IOException { //Узнаём имя пользователя
         while (true) {                                                      //Сюда отправляется запрос с данными из tryToAuth
             String str = in.readUTF();
             if (str.startsWith("/auth")) {

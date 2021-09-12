@@ -38,7 +38,8 @@ public class Controller {
 
 
     private String name;
-    private String directory = String.format("history_%s.txt", name);
+//    private String directory;
+    ChatHistory chatHistory = new ChatHistory(name);
 
 
     public void setAuthorized(boolean authorized) { //При значении "true" пропадает окно авторизации, появляется чат
@@ -80,7 +81,12 @@ public class Controller {
         String password = passwordField.getText();
         try {
             out.writeUTF("/auth " + login + " " + password);
-            this.name = loginField.getText();
+            if (login != null) {
+                this.name = loginField.getText();
+            }
+//            directory = String.format("history_%s.txt", name);
+            chatHistory.setDirectory(login);
+            System.out.println(name);
             loginField.clear();
             passwordField.clear();
         } catch (IOException e) {
@@ -116,7 +122,9 @@ public class Controller {
                 }
                 if (inputMessage.startsWith("/authok ")) {  //Сервер вернёт сообщение, которе начинается с "/authok ", если пользователь существует в БД
                     setAuthorized(true);
-                    loadHistory();
+//                    loadHistory();
+                    chatHistory.loadHistory(chatArea);
+
                     break;
                 }
                 chatArea.appendText(inputMessage + "\n");
@@ -140,7 +148,8 @@ public class Controller {
                     continue;
                 }
                 chatArea.appendText(inputMessage + "\n");
-                saveHistory();
+//                saveHistory();
+                chatHistory.saveHistory(chatArea);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -200,50 +209,50 @@ public class Controller {
     }
 
 
-    private void saveHistory() throws IOException {
-        try {
-            File history = new File(directory);
-            if (!history.exists()) {
-                System.out.println("File is not exist. Creating.");
-                history.createNewFile();
-            }
-            PrintWriter fileWriter = new PrintWriter(new FileWriter(history, false));
-
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(chatArea.getText());
-            bufferedWriter.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadHistory() throws IOException {
-        int historysrtings = 100;
-        File history = new File(directory);
-        if (!history.exists()) {
-            System.out.println("File is not exist. Creating.");
-            history.createNewFile();
-        }
-        List<String> historyList = new ArrayList<>();
-        FileInputStream in = new FileInputStream(history);
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-
-        String temp;
-        while ((temp = bufferedReader.readLine()) != null) {
-            historyList.add(temp);
-        }
-
-        if (historyList.size() > historysrtings) {
-            for (int i = historyList.size() - historysrtings; i <= (historyList.size() - 1); i++) {
-                chatArea.appendText(historyList.get(i) + "\n");
-            }
-        } else {
-            for (int i = 0; i < historyList.size(); i++) {
-                chatArea.appendText(historyList.get(i) + "\n");
-            }
-        }
-    }
+//    private void saveHistory() throws IOException {
+//        try {
+//            File history = new File(directory);
+//            if (!history.exists()) {
+//                System.out.println("File is not exist. Creating.");
+//                history.createNewFile();
+//            }
+//            PrintWriter fileWriter = new PrintWriter(new FileWriter(history, false));
+//
+//            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+//            bufferedWriter.write(chatArea.getText());
+//            bufferedWriter.close();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private void loadHistory() throws IOException {
+//        int historysrtings = 100;
+//        File history = new File(directory);
+//        if (!history.exists()) {
+//            System.out.println("File is not exist. Creating.");
+//            history.createNewFile();
+//        }
+//        List<String> historyList = new ArrayList<>();
+//        FileInputStream in = new FileInputStream(history);
+//        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+//
+//        String temp;
+//        while ((temp = bufferedReader.readLine()) != null) {
+//            historyList.add(temp);
+//        }
+//
+//        if (historyList.size() > historysrtings) {
+//            for (int i = historyList.size() - historysrtings; i <= (historyList.size() - 1); i++) {
+//                chatArea.appendText(historyList.get(i) + "\n");
+//            }
+//        } else {
+//            for (int i = 0; i < historyList.size(); i++) {
+//                chatArea.appendText(historyList.get(i) + "\n");
+//            }
+//        }
+//    }
 }
 
 
