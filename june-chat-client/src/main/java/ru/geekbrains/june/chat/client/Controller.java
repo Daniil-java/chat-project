@@ -15,6 +15,8 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Controller {
     @FXML
@@ -103,6 +105,9 @@ public class Controller {
             socket = new Socket("localhost", 8189);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+//            ExecutorService service = Executors.newFixedThreadPool(10);
+//            service.execute(() -> logic());
+//            service.shutdown();
             new Thread(() -> logic()).start();
         } catch (IOException e) {
             showError("Невозможно подключиться к серверу");
