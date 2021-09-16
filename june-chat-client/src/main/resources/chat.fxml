@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="center" xmlns="http://javafx.com/javafx/8.0.211" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.geekbrains.june.chat.client.Controller">
+    <HBox fx:id="authPanel">
+        <TextField promptText="Логин" fx:id="loginField" HBox.hgrow="ALWAYS"/>
+        <PasswordField promptText="Пароль" fx:id="passwordField" />
+        <Button onAction="#tryToAuth">Авторизоваться</Button>
+    </HBox>
+    <HBox fx:id="registrationPanel">
+        <TextField HBox.hgrow="ALWAYS" promptText="Логин" fx:id="regLogin"/>
+        <PasswordField  promptText="Пароль" fx:id="regPassword" onAction="#registration"/>
+        <TextField HBox.hgrow="ALWAYS" promptText="Никнейм" fx:id="regNick"/>
+        <Button text="Зарегистрироваться" onAction="#registration"/>
+    </HBox>
+    <HBox VBox.vgrow="ALWAYS">
+        <TextArea fx:id="chatArea" editable="false" HBox.hgrow="ALWAYS"/>
+        <ListView onMouseClicked="#clientsListDoubleClick" fx:id="clientsListView" visible="false" managed="false" minWidth="180" maxWidth="180"/>
+    </HBox>
+
+    <HBox fx:id="msgPanel" visible="false" managed="false">
+        <TextField promptText="Введите сообщение" fx:id="messageField" HBox.hgrow="ALWAYS" onAction="#sendMessage"/>
+        <Button onAction="#sendMessage">Отправить</Button>
+    </HBox>
+    <HBox fx:id="nicknamePanel" visible="false" managed="false">
+        <TextField editable="false" fx:id="nicknameField" HBox.hgrow="ALWAYS"/>
+    </HBox>
+</VBox>
