@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
     private Server server;
@@ -24,7 +26,10 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
             //Поток общения с клиентом
-            new Thread(() -> logic()).start();
+            ExecutorService service = Executors.newFixedThreadPool(10);
+            service.execute(() -> logic());
+            service.shutdown();
+//            new Thread(() -> logic()).start();
         } catch (IOException e) {
             e.printStackTrace();
         }

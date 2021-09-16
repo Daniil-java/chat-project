@@ -34,6 +34,7 @@ public class AuthService { //База данных
         ps.setString(3, nick);
         ps.execute();
 
+
 //        try {
 //            boolean rs = stmt.execute(sql);
 //        } catch (SQLException e) {
